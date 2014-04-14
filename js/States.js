@@ -1,4 +1,22 @@
 States = {};
+States.MainMenuState = function(game){
+    this.button;
+}
+States.MainMenuState.prototype = {
+    preload: function() {
+        this.load.image('background', 'assets/mainmenu.png');
+        this.load.spritesheet('button', 'assets/button.png', 193, 71, 3);
+    },
+
+    create: function() {
+        this.add.sprite(0, 0, 'background');
+        this.button = this.add.button(703.5, 464.5, 'button', this.startGame, this, 1, 1, 0);
+    },
+
+    startGame: function() {
+        this.state.start('dungeon');
+    }
+}
 States.DungeonState = function(game){
 	this.generator;
     this.gameMap;

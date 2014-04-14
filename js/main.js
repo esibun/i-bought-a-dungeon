@@ -12,8 +12,9 @@ window.onload = function() {
     
     function create(){
     //dd = new DungeonState(game);
+    game.state.add('mainmenu', States.MainMenuState);
     game.state.add('dungeon', States.DungeonState);
-    game.state.start('dungeon');
+    game.state.start('mainmenu');
     }
     
     function update(){}
