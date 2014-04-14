@@ -14,6 +14,7 @@ window.onload = function() {
     //dd = new DungeonState(game);
     game.state.add('mainmenu', States.MainMenuState);
     game.state.add('dungeon', States.DungeonState);
+    game.state.add('gameover', States.LoseState);
     game.state.start('mainmenu');
     }
     

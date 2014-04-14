@@ -144,6 +144,8 @@ States.DungeonState.prototype = {
         this.key1 = this.input.keyboard.addKey(Phaser.Keyboard.ONE);
         this.key1.onDown.add(this.newMap, this);
         
+        //Game over state
+        this.player.events.onKilled.add(this.gameOver, this);
         
     },
     
@@ -297,5 +299,28 @@ States.DungeonState.prototype = {
     	
     	//Create new enemies
     	this.enemies = this.spawner.spawnRandom(this.gameMap, 75, 'player', 5, 1);
+    },
+
+    //Advances to the game over screen
+    gameOver: function() {
+        this.state.start('gameover');
+    }
+}
+States.LoseState = function(game){
+    this.button;
+}
+States.LoseState.prototype = {
+    preload: function() {
+        this.load.image('background', 'assets/losescreen.jpg');
+        this.load.spritesheet('button', 'assets/continuebutton.png', 193, 71, 3);
+    },
+
+    create: function() {
+        this.add.sprite(0, 0, 'background');
+        this.button = this.add.button(703.5, 464.5, 'button', this.startGame, this, 1, 1, 0);
+    },
+
+    startGame: function() {
+        this.state.start('dungeon');
     }
 }
