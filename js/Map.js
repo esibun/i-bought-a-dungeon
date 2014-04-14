@@ -304,7 +304,7 @@ Map.prototype.createDoors = function(startX, startY, width, height, map){
 				x--;
 			}
 			if(x > 1 && x < this.width - 2){
-				var t = Math.floor(Math.random() * (height-1) ) + 2;
+				var t = Math.floor(Math.random() * (height-1) ) + 1;
 				
 				var n = 0;
 				for(n = t; n > 0 && map[x+1][y] != 1; n--){
