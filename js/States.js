@@ -61,15 +61,13 @@ States.DungeonState.prototype = {
         this.load.image('floor', 'assets/floor.png');
         this.load.image('invisible', 'assets/invisibleWall.png');
         this.load.image('sword', 'assets/sword.png');
+        this.load.spritesheet('healthbar', 'assets/health_bar.png', 35, 32, 6);
         this.load.spritesheet('player', 'assets/character.png', 51, 70, 6);
         
         this.load.audio('swing', 'assets/Swoosh.mp3');
     },
     
     create: function() {
-    
-    	
-    
   		this.stage.backgroundColor = 0x000000;
     	this.enemies = new Array();
     	
@@ -127,6 +125,18 @@ States.DungeonState.prototype = {
         this.physics.enable(this.player, Phaser.Physics.ARCADE);
         
         this.newMap();
+
+        //Setup health bar
+        this.healthbar1 = this.add.image(0, 0, 'healthbar');
+        this.healthbar2 = this.add.image(35, 0, 'healthbar');
+        this.healthbar3 = this.add.image(70, 0, 'healthbar');
+        this.healthbar4 = this.add.image(105, 0, 'healthbar');
+        this.healthbar5 = this.add.image(140, 0, 'healthbar');
+        this.healthbar5.fixedToCamera = true;
+        this.healthbar4.fixedToCamera = true;
+        this.healthbar3.fixedToCamera = true;
+        this.healthbar2.fixedToCamera = true;
+        this.healthbar1.fixedToCamera = true;
         
 		//Setup camera
         this.camera.bounds = null;
@@ -236,6 +246,7 @@ States.DungeonState.prototype = {
     		this.player.damage(1);
     		this.damageTimer = 0.5;
     	}
+        this.updateHealthBar(this.player.health);
     },
     
     //Moves the sword sprite and the sword body in a circular motion each frame
@@ -304,6 +315,25 @@ States.DungeonState.prototype = {
     //Advances to the game over screen
     gameOver: function() {
         this.state.start('gameover');
+    },
+    updateHealthBar: function(health) {
+        switch (health) {
+            case 1:
+                this.healthbar2.visible = false;
+            case 2:
+                this.healthbar3.visible = false;
+            case 3:
+                this.healthbar4.visible = false;
+            case 4:
+                this.healthbar5.visible = false;
+                break;
+            default:
+                this.healthbar5.visible = false;
+                this.healthbar4.visible = false;
+                this.healthbar3.visible = false;
+                this.healthbar2.visible = false;
+                this.healthbar1.visible = false;
+        }
     }
 }
 States.LoseState = function(game){
