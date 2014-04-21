@@ -1,3 +1,6 @@
+//persistent variables
+var score = 0;
+
 States = {};
 States.MainMenuState = function(game){
     this.button;
@@ -237,6 +240,7 @@ States.DungeonState.prototype = {
     //Unfinished
     doDamage: function(hitter, receiver){
     	receiver.damage(1);
+        score += 100;
 		//receiver.health -= 1;
 		//if(receiver.health <= 0)
 		//	receiver.kill();
@@ -348,6 +352,7 @@ States.LoseState.prototype = {
     create: function() {
         this.add.sprite(0, 0, 'background');
         this.button = this.add.button(703.5, 464.5, 'button', this.startGame, this, 1, 1, 0);
+        this.add.text(0, 960, "Final Score: " + score, { font: "40px Arial", fill: "#ffffff", align: "left" })
     },
 
     startGame: function() {
