@@ -225,11 +225,11 @@ States.DungeonState.prototype = {
     },
     
     //Unfinished
-    doDamage: function(hitter, reciever){
-    	reciever.damage(1);
-		//reciever.health -= 1;
-		//if(reciever.health <= 0)
-		//	reciever.kill();
+    doDamage: function(hitter, receiver){
+    	receiver.damage(1);
+		//receiver.health -= 1;
+		//if(receiver.health <= 0)
+		//	receiver.kill();
     },
     takeDamage: function(){
     	if(this.damageTimer <= 0){
