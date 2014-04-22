@@ -66,7 +66,7 @@ States.DungeonState.prototype = {
 		this.load.image('invisible', 'assets/invisibleWall.png');
 		this.load.image('sword', 'assets/sword.png');
 		this.load.spritesheet('healthbar', 'assets/health_bar.png', 35, 32, 6);
-		this.load.spritesheet('player', 'assets/character.png', 51, 70, 6);
+		this.load.spritesheet('player', 'assets/playercharacter.png', 51, 70, 6);
 		
 		this.load.audio('swing', 'assets/Swoosh.mp3');
 	},
