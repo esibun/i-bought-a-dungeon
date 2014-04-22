@@ -1,5 +1,6 @@
 //persistent variables
 var score = 0;
+var iter = 0;
 
 States = {};
 States.MainMenuState = function(game){
@@ -228,10 +229,10 @@ States.DungeonState.prototype = {
 		
 		//Enemy collisions (sword and walls)
 		for(var i = 0; i < this.swordBody.length; i++){
-			for(var j = 0; j < this.enemies.length; j++){
-				this.physics.arcade.overlap(this.swordBody[i], this.enemies[j].sprite, this.doDamage, null, this);
+			for(iter = 0; iter < this.enemies.length; iter++){
+				this.physics.arcade.overlap(this.swordBody[i], this.enemies[iter].sprite, this.doDamage, null, this);
 				for(var x = 0; x < this.mapRenderer.colliders.length; x++){
-					this.physics.arcade.collide(this.enemies[j].sprite, this.mapRenderer.colliders[x], null, null, this);
+					this.physics.arcade.collide(this.enemies[iter].sprite, this.mapRenderer.colliders[x], null, null, this);
 				}
 			}
 		}
@@ -242,12 +243,11 @@ States.DungeonState.prototype = {
 	
 	//Unfinished
 	doDamage: function(hitter, receiver){
-		receiver.damage(1);
-		if (receiver.health <= 0 )
+		this.enemies[iter].takeDamage(1);
+		if (this.enemies[iter].health <= 0 ) {
 			score += 10;
-		//receiver.health -= 1;
-		//if(receiver.health <= 0)
-		//	receiver.kill();
+			this.enemies.splice(iter, 1);
+		}
 	},
 	takeDamage: function(){
 		if(this.damageTimer <= 0){
@@ -317,7 +317,7 @@ States.DungeonState.prototype = {
 		}
 		
 		//Create new enemies
-		this.enemies = this.spawner.spawnRandom(this.gameMap, 75, 'player', 5, 1);
+		this.enemies = this.spawner.spawnRandom(this.gameMap, 75, 'player', 1, 1);
 	},
 
 	//Advances to the game over screen
