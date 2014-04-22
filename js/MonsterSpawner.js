@@ -53,20 +53,20 @@ Character.prototype.moveTo = function(target, speed, map){
 	if(distance < 1.5){
 		
 /*		var y =	this.tileSize * Math.sin((this.sprite.angle) * Math.PI / 180);
-    	var x = this.tileSize * Math.cos((this.sprite.angle) * Math.PI / 180);
-    	x = Math.floor(x);
-    	y = Math.floor(y);
-    	
-    	var checkX = this.calculateMapPositionX(x);
-    	var checkY = this.calculateMapPositionY(y);
-    	
-    	this.directPath = true;
-    	if(checkX < map.length && checkX > 0 && checkY > 0 && checkY < map[checkX].length && map[checkX][checkY] == 1){
-    		this.directPath = false;
-    	}
-    	
-    	if(this.directPath){*/
-    		this.sprite.rotation = this.sprite.game.physics.arcade.angleToXY(this.sprite, target.x, target.y);
+		var x = this.tileSize * Math.cos((this.sprite.angle) * Math.PI / 180);
+		x = Math.floor(x);
+		y = Math.floor(y);
+		
+		var checkX = this.calculateMapPositionX(x);
+		var checkY = this.calculateMapPositionY(y);
+		
+		this.directPath = true;
+		if(checkX < map.length && checkX > 0 && checkY > 0 && checkY < map[checkX].length && map[checkX][checkY] == 1){
+			this.directPath = false;
+		}
+		
+		if(this.directPath){*/
+			this.sprite.rotation = this.sprite.game.physics.arcade.angleToXY(this.sprite, target.x, target.y);
 			this.sprite.game.physics.arcade.moveToXY(this.sprite, target.x, target.y, (speed * 0.9));
 			this.sprite.animations.play('walk', 7, false);
 	//	}
@@ -91,20 +91,20 @@ Character.prototype.dealDamage = function(target){
 }
 
 Character.prototype.calculateSpriteMapPosition = function(){
-    this.mapPositionX = this.sprite.x % this.tileSize;
-    this.mapPositionY = (this.sprite.game.height - this.sprite.y) % this.tileSize;
-    this.mapPositionX = (this.sprite.x - this.mapPositionX) / this.tileSize;
-    this.mapPositionY = (this.sprite.game.height - this.sprite.y - this.mapPositionY) / this.tileSize;
+	this.mapPositionX = this.sprite.x % this.tileSize;
+	this.mapPositionY = (this.sprite.game.height - this.sprite.y) % this.tileSize;
+	this.mapPositionX = (this.sprite.x - this.mapPositionX) / this.tileSize;
+	this.mapPositionY = (this.sprite.game.height - this.sprite.y - this.mapPositionY) / this.tileSize;
 }
 
 Character.prototype.calculateMapPositionX = function(x){
 	x += this.sprite.x;
 	var delta = x % this.tileSize;
-    return (x - delta) / this.tileSize;
+	return (x - delta) / this.tileSize;
 }
 
 Character.prototype.calculateMapPositionY = function(y){
 	y += this.sprite.y;
-    var delta = (this.sprite.game.height - y) % this.tileSize;
-    return (this.sprite.game.height - y - delta) / this.tileSize;
+	var delta = (this.sprite.game.height - y) % this.tileSize;
+	return (this.sprite.game.height - y - delta) / this.tileSize;
 }    
