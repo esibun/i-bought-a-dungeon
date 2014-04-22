@@ -159,6 +159,9 @@ States.DungeonState.prototype = {
         
         //Game over state
         this.player.events.onKilled.add(this.gameOver, this);
+
+        //Reset score
+        score = 0;
         
     },
     
@@ -240,7 +243,8 @@ States.DungeonState.prototype = {
     //Unfinished
     doDamage: function(hitter, receiver){
     	receiver.damage(1);
-        score += 10;
+        if (receiver.health <= 0 )
+        	score += 10;
 		//receiver.health -= 1;
 		//if(receiver.health <= 0)
 		//	receiver.kill();
