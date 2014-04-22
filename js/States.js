@@ -155,7 +155,7 @@ States.DungeonState.prototype = {
 
         
         this.key1 = this.input.keyboard.addKey(Phaser.Keyboard.ONE);
-        this.key1.onDown.add(this.newMap, this);
+        //this.key1.onDown.add(this.newMap, this);
         
         //Game over state
         this.player.events.onKilled.add(this.gameOver, this);
