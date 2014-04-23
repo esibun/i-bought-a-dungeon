@@ -217,10 +217,6 @@ States.DungeonState.prototype = {
 			this.player.animations.play('attack');
 		}
 		
-		//player collisions
-		for (var i = 0; i < this.mapRenderer.colliders.length; i++){
-			this.physics.arcade.collide(this.player, this.mapRenderer.colliders[i], null, null, this);
-		}
 		//Enemy movement and collision with player
 		for(var i = 0; i < this.enemies.length; i++){
 			this.enemies[i].moveTo(this.player, this.speed, this.gameMap);
@@ -235,6 +231,11 @@ States.DungeonState.prototype = {
 					this.physics.arcade.collide(this.enemies[iter].sprite, this.mapRenderer.colliders[x], null, null, this);
 				}
 			}
+		}
+
+		//player collisions
+		for (var i = 0; i < this.mapRenderer.colliders.length; i++){
+			this.physics.arcade.collide(this.player, this.mapRenderer.colliders[i], null, null, this);
 		}
 		
 		//Activate sprites within the scope of the window
