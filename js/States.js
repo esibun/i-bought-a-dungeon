@@ -132,11 +132,11 @@ States.DungeonState.prototype = {
 		this.newMap();
 
 		//Setup health bar
-		this.healthbar1 = this.add.image(0, 0, 'healthbar');
-		this.healthbar2 = this.add.image(35, 0, 'healthbar');
-		this.healthbar3 = this.add.image(70, 0, 'healthbar');
-		this.healthbar4 = this.add.image(105, 0, 'healthbar');
-		this.healthbar5 = this.add.image(140, 0, 'healthbar');
+		this.healthbar1 = this.add.image(5, 5, 'healthbar');
+		this.healthbar2 = this.add.image(40, 5, 'healthbar');
+		this.healthbar3 = this.add.image(75, 5, 'healthbar');
+		this.healthbar4 = this.add.image(110, 5, 'healthbar');
+		this.healthbar5 = this.add.image(145, 5, 'healthbar');
 		this.healthbar5.fixedToCamera = true;
 		this.healthbar4.fixedToCamera = true;
 		this.healthbar3.fixedToCamera = true;
