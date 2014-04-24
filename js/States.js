@@ -68,6 +68,8 @@ States.DungeonState.prototype = {
 		this.load.spritesheet('healthbar', 'assets/health_bar.png', 35, 32, 6);
 		this.load.spritesheet('player', 'assets/playercharacter.png', 51, 70, 6);
 		this.load.spritesheet('darkknight', 'assets/darkknight.png', 50, 70, 6);
+		this.load.spritesheet('archer', 'assets/archer.png', 50, 70, 6);
+		this.load.spritesheet('bloodknight', 'assets/bloodknight.png', 50, 70, 6);
 		
 		this.load.audio('swing', 'assets/Swoosh.mp3');
 	},
@@ -319,7 +321,11 @@ States.DungeonState.prototype = {
 		}
 		
 		//Create new enemies
-		this.enemies = this.spawner.spawnRandom(this.gameMap, 75, 'darkknight', 1, 1);
+		this.enemies = this.spawner.spawnRandom(this.gameMap, 25, 'darkknight', 1, 1);
+		var temp = this.spawner.spawnRandom(this.gameMap, 25, 'bloodknight', 1, 1);
+		this.enemies.push.apply(this.enemies, temp);
+		temp = this.spawner.spawnRandom(this.gameMap, 25, 'archer', 1, 1);
+		this.enemies.push.apply(this.enemies, temp);
 	},
 
 	//Advances to the game over screen
