@@ -7,12 +7,16 @@ Enemy Types Implementation (4/24/14)
  - Coding ([#2](https://github.com/esibun/i-bought-a-dungeon/issues/2))
 
 
-
 Release 1 (4/29/14)
 -------------------
 
 - Add hotkeys (namely E to block) ([#5](https://github.com/esibun/i-bought-a-dungeon/issues/5))
-
+- Resize enemies to be same size as player
+- Fix player hitbox
+- Add score to main screen
+- Make buttons slightly larger/give them transparent backgrounds
+- Lose screen score-centered and larger
+- Setup recording times for sounds
 
 No Milestone
 ------------
