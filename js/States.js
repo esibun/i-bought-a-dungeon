@@ -211,7 +211,7 @@ States.DungeonState.prototype = {
 			this.swinging = true;
 			this.sword.revive();
 			this.currentSwing = 0;
-			this.swingTimer = 1;
+			this.swingTimer = 0.5;
 			this.swingSound.play();
 		}
 		//Swing the sword if in the swinging is true

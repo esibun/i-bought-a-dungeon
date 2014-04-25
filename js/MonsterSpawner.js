@@ -74,7 +74,7 @@ Character.prototype.moveTo = function(target, speed, map){
 }
 
 Character.prototype.takeDamage =  function(amount){
-	if(this.lastTimeTakingDamage < this.sprite.game.time.now - 200){
+	if(this.lastTimeTakingDamage < this.sprite.game.time.now - 500){
 		this.lastTimeTakingDamage = this.sprite.game.time.now;
 		this.health -= amount;
 		if(this.health <= 0)
