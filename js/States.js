@@ -46,6 +46,7 @@ States.DungeonState = function(game){
 	this.spawner;
 	this.swingSound;
 	this.mapRenderer;
+	this.scoreText;
 		
 	this.damageTimer = 0;
 		
@@ -144,6 +145,10 @@ States.DungeonState.prototype = {
 		this.healthbar3.fixedToCamera = true;
 		this.healthbar2.fixedToCamera = true;
 		this.healthbar1.fixedToCamera = true;
+
+		//Setup score text
+		this.scoreText = this.add.text(1400, 0, "Score: 0", { font: "30px Arial", fill: "#ffffff", align: "right" })
+		this.scoreText.fixedToCamera = true;
 		
 		//Setup camera
 		this.camera.bounds = null;
@@ -248,6 +253,9 @@ States.DungeonState.prototype = {
 		
 		//Activate sprites within the scope of the window
 		this.mapRenderer.drawScreen(this.player);
+
+		//Update score
+		this.scoreText.text = "Score: " + score;
 	},
 	
 	//Unfinished
