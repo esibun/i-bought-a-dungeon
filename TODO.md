@@ -1,12 +1,5 @@
 There should be issues for each of these to-do's up on GitHub:
 
-Enemy Types Implementation (4/24/14)
-------------------------------------
-- Enemy Types implemenation
- - Sprites ([#12](https://github.com/esibun/i-bought-a-dungeon/issues/12))
- - Coding ([#2](https://github.com/esibun/i-bought-a-dungeon/issues/2))
-
-
 Release 1 (4/29/14)
 -------------------
 - Add hotkeys (namely E to block) ([#5](https://github.com/esibun/i-bought-a-dungeon/issues/5))
@@ -15,6 +8,7 @@ Release 1 (4/29/14)
 - Make buttons slightly larger/give them transparent backgrounds
 - Lose screen score-centered and larger
 - Setup recording times for sounds
+- Enemy type coding ([#2](https://github.com/esibun/i-bought-a-dungeon/issues/2))
 
 No Milestone
 ------------
