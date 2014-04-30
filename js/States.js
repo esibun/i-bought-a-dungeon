@@ -348,13 +348,39 @@ States.DungeonState.prototype = {
 	updateHealthBar: function(health) {
 		switch (health) {
 			case 1:
-				this.healthbar2.visible = false;
-			case 2:
-				this.healthbar3.visible = false;
-			case 3:
+				this.healthbar5.visible = false;
 				this.healthbar4.visible = false;
+				this.healthbar3.visible = false;
+				this.healthbar2.visible = false;
+				this.healthbar1.visible = true;
+				break;
+			case 2:
+				this.healthbar5.visible = false;
+				this.healthbar4.visible = false;
+				this.healthbar3.visible = false;
+				this.healthbar2.visible = true;
+				this.healthbar1.visible = true;
+				break;
+			case 3:
+				this.healthbar5.visible = false;
+				this.healthbar4.visible = false;
+				this.healthbar3.visible = true;
+				this.healthbar2.visible = true;
+				this.healthbar1.visible = true;
+				break;
 			case 4:
 				this.healthbar5.visible = false;
+				this.healthbar4.visible = true;
+				this.healthbar3.visible = true;
+				this.healthbar2.visible = true;
+				this.healthbar1.visible = true;
+				break;
+			case 5:
+				this.healthbar5.visible = true;
+				this.healthbar4.visible = true;
+				this.healthbar3.visible = true;
+				this.healthbar2.visible = true;
+				this.healthbar1.visible = true;
 				break;
 			default:
 				this.healthbar5.visible = false;
