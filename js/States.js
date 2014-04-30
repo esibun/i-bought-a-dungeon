@@ -42,6 +42,8 @@ States.DungeonState = function(game){
 	this.swordBody;
 	this.swinging = false;
 	this.swingTimer = 0;
+	this.shield;
+	this.shieldUp = false;
 	this.enemies;
 	this.spawner;
 	this.swingSound;
@@ -51,6 +53,7 @@ States.DungeonState = function(game){
 	this.damageTimer = 0;
 		
 	this.key1;
+	this.keye;
 	
 	this.degrees = 1;
 	this.maxSwingAngle = 135;
@@ -66,6 +69,7 @@ States.DungeonState.prototype = {
 		this.load.image('floor', 'assets/floor.png');
 		this.load.image('invisible', 'assets/invisibleWall.png');
 		this.load.image('sword', 'assets/sword.png');
+		this.load.image('shield', 'assets/shield.png');
 		this.load.spritesheet('healthbar', 'assets/health_bar.png', 35, 32, 6);
 		this.load.spritesheet('player', 'assets/playercharacter.png', 51, 70, 6);
 		this.load.spritesheet('darkknight', 'assets/darkknight.png', 50, 70, 6);
@@ -105,6 +109,13 @@ States.DungeonState.prototype = {
 		this.sword.scale.y *= this.tileScale;
 		this.sword.anchor.setTo(0, 1.3);
 		this.sword.kill();
+
+		//And the shield sprite
+		this.shield = this.add.sprite(0, 0, 'shield');
+		this.shield.scale.x *= this.tileScale;
+		this.shield.scale.y *= this.tileScale;
+		this.shield.anchor.setTo(0.45, 2.2);
+		this.shield.kill();
 		
 		//Create the swords body
 		this.swordBody = new Array();
@@ -165,6 +176,10 @@ States.DungeonState.prototype = {
 		
 		this.key1 = this.input.keyboard.addKey(Phaser.Keyboard.ONE);
 		//this.key1.onDown.add(this.newMap, this);
+
+		this.keye = this.input.keyboard.addKey(Phaser.Keyboard.E);
+		this.keye.onDown.add(this.raiseShield, this);
+		this.keye.onUp.add(this.lowerShield, this);
 		
 		//Game over state
 		this.player.events.onKilled.add(this.gameOver, this);
@@ -212,7 +227,7 @@ States.DungeonState.prototype = {
 			this.swingTimer -= this.time.physicsElapsed;
 		}
 		//Activate swing animation if the swing timer is 0
-		if(this.input.activePointer.isDown && !this.swinging && this.swingTimer <= 0){
+		if(this.input.activePointer.isDown && !this.swinging && this.swingTimer <= 0 && !this.shieldUp){
 			this.swinging = true;
 			this.sword.revive();
 			this.currentSwing = 0;
@@ -223,6 +238,11 @@ States.DungeonState.prototype = {
 		if(this.swinging){
 			this.swingSword();
 			this.player.animations.play('attack');
+		}
+
+		//Update shield position if up
+		if ( this.shieldUp ) {
+			this.raiseShield();
 		}
 		
 		//Enemy movement and collision with player
@@ -267,7 +287,7 @@ States.DungeonState.prototype = {
 		}
 	},
 	takeDamage: function(){
-		if(this.damageTimer <= 0){
+		if(this.damageTimer <= 0 && !this.shieldUp){
 			this.player.damage(1);
 			this.damageTimer = 0.5;
 		}
@@ -276,34 +296,52 @@ States.DungeonState.prototype = {
 	
 	//Moves the sword sprite and the sword body in a circular motion each frame
 	swingSword: function(){
-		this.swordLength = this.tileScale / this.swordLength;
-		if(this.degrees <= this.maxSwingAngle){
-			this.sword.x = this.player.x;
-			this.sword.y = this.player.y;
-			this.degrees += (this.swingSpeed * this.time.physicsElapsed);
-			this.sword.angle = this.player.angle + this.degrees;
-			
-			var y = Math.sin((this.sword.angle + 90) * Math.PI / 180);
-			var x = Math.cos((this.sword.angle + 90) * Math.PI / 180);
-			
-			for(var i = 0; i < this.swordBody.length; i++){
-				this.swordBody[i].revive();
-				this.swordBody[i].visible = false;
-				this.swordBody[i].body.x = this.sword.x - (x * this.swordLength * (1 + this.sword.anchor.y) * i / this.swordBody.length);
-				this.swordBody[i].body.y = this.sword.y - (y * this.swordLength * (1 + this.sword.anchor.y) * i / this.swordBody.length);
+		if (!this.shieldUp) {
+			this.swordLength = this.tileScale / this.swordLength;
+			if(this.degrees <= this.maxSwingAngle){
+				this.sword.x = this.player.x;
+				this.sword.y = this.player.y;
+				this.degrees += (this.swingSpeed * this.time.physicsElapsed);
+				this.sword.angle = this.player.angle + this.degrees;
+				
+				var y = Math.sin((this.sword.angle + 90) * Math.PI / 180);
+				var x = Math.cos((this.sword.angle + 90) * Math.PI / 180);
+				
+				for(var i = 0; i < this.swordBody.length; i++){
+					this.swordBody[i].revive();
+					this.swordBody[i].visible = false;
+					this.swordBody[i].body.x = this.sword.x - (x * this.swordLength * (1 + this.sword.anchor.y) * i / this.swordBody.length);
+					this.swordBody[i].body.y = this.sword.y - (y * this.swordLength * (1 + this.sword.anchor.y) * i / this.swordBody.length);
+				}
+				this.currentSwing++;
 			}
-			this.currentSwing++;
-		}
-		else{
-			for(var i = 0; i < this.swordBody.length; i++){
-				this.swordBody[i].kill();
+			else{
+				for(var i = 0; i < this.swordBody.length; i++){
+					this.swordBody[i].kill();
+				}
+				this.sword.kill();
+				this.degrees = 25;
+				this.swinging = false;
 			}
-			this.sword.kill();
-			this.degrees = 25;
-			this.swinging = false;
 		}
 	},
 
+	//Raises shield and updates position each frame
+	raiseShield: function() {
+		if (!this.swinging) {
+			this.shieldUp = true;
+			this.shield.x = this.player.x;
+			this.shield.y = this.player.y;
+			this.shield.angle = this.player.angle + 90;
+			this.shield.revive();
+		}
+	},
+
+	//Lowers shield and kills the associated sprite
+	lowerShield: function() {
+		this.shieldUp = false;
+		this.shield.kill();
+	},
 
 	//Creats a new map
 	newMap: function(){
