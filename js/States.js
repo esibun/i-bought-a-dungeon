@@ -59,7 +59,10 @@ States.DungeonState = function(game){
 	this.maxSwingAngle = 135;
 	this.swingSpeed = 500;
 	this.currentSwing;
-	this.swordLength = 40;
+	this.swordSpriteLength = 40;
+	this.swordLength;
+	
+	this.stairs;
 };
 
 States.DungeonState.prototype = {
@@ -67,6 +70,7 @@ States.DungeonState.prototype = {
 		this.load.image('corner', 'assets/corner.png');
 		this.load.image('wall', 'assets/wall.png');
 		this.load.image('floor', 'assets/floor.png');
+		this.load.image('stairs', 'assets/stairs.png');
 		this.load.image('invisible', 'assets/invisibleWall.png');
 		this.load.image('sword', 'assets/sword.png');
 		this.load.image('shield', 'assets/shield.png');
@@ -135,6 +139,12 @@ States.DungeonState.prototype = {
 		this.swordBody[i].visible = false;
 		this.physics.enable(this.swordBody[i], Phaser.Physics.ARCADE);
 		
+		//Create stair sprite
+		this.stairs = this.add.sprite(0, 0, 'stairs');
+		this.stairs.scale.x *= this.tileScale;
+		this.stairs.scale.y *= this.tileScale;
+		this.physics.enable(this.stairs, Phaser.Physics.ARCADE);
+		
 		//Setup player sprite
 		this.player = this.add.sprite(0, 0, 'player');
 		this.player.health = 5;
@@ -142,9 +152,8 @@ States.DungeonState.prototype = {
 		this.player.scale.y *= this.tileScale/2;
 		this.player.anchor.setTo(0.5, 0.5);
 		this.physics.enable(this.player, Phaser.Physics.ARCADE);
+		this.player.body.setSize(51, 51, 0, this.tileSize/5);
 		
-		this.newMap();
-
 		//Setup health bar
 		this.healthbar1 = this.add.image(5, 5, 'healthbar');
 		this.healthbar2 = this.add.image(40, 5, 'healthbar');
@@ -156,10 +165,16 @@ States.DungeonState.prototype = {
 		this.healthbar3.fixedToCamera = true;
 		this.healthbar2.fixedToCamera = true;
 		this.healthbar1.fixedToCamera = true;
-
+		
 		//Setup score text
 		this.scoreText = this.add.text(1400, 0, "Score: 0", { font: "30px Arial", fill: "#ffffff", align: "right" })
 		this.scoreText.fixedToCamera = true;
+		
+		this.newMap();
+
+		
+
+		
 		
 		//Setup camera
 		this.camera.bounds = null;
@@ -187,6 +202,7 @@ States.DungeonState.prototype = {
 		//Reset score
 		score = 0;
 		
+		this.swordLength = this.swordSpriteLength * this.tileScale;
 	},
 	
 	update: function() {
@@ -248,7 +264,7 @@ States.DungeonState.prototype = {
 		//Enemy movement and collision with player
 		for(var i = 0; i < this.enemies.length; i++){
 			this.enemies[i].moveTo(this.player, this.speed, this.gameMap);
-			this.physics.arcade.collide(this.enemies[i].sprite, this.player, this.takeDamage, null, this);
+			this.physics.arcade.overlap(this.enemies[i].sprite, this.player, this.takeDamage, null, this);
 		}
 		
 		//Enemy collisions (sword and walls)
@@ -270,6 +286,7 @@ States.DungeonState.prototype = {
 		for (var i = 0; i < this.mapRenderer.colliders.length; i++){
 			this.physics.arcade.collide(this.player, this.mapRenderer.colliders[i], null, null, this);
 		}
+		this.physics.arcade.overlap(this.player, this.stairs, this.newMap, null, this);
 		
 		//Activate sprites within the scope of the window
 		this.mapRenderer.drawScreen(this.player);
@@ -278,9 +295,18 @@ States.DungeonState.prototype = {
 		this.scoreText.text = "Score: " + score;
 	},
 	
+/*	render: function(){
+		this.game.debug.body(this.player);
+		for(var i = 0; i < this.enemies.length; i++)
+			this.game.debug.body(this.enemies[i].sprite);
+		for(var i = 0; i < this.swordBody.length; i++)
+			this.game.debug.body(this.swordBody[i]);
+	},*/
+	
 	//Unfinished
 	doDamage: function(hitter, receiver){
 		this.enemies[iter].takeDamage(1);
+		this.enemies[iter].knockback(this.player, 400);
 		if (this.enemies[iter].health <= 0 ) {
 			score += 10;
 			this.enemies.splice(iter, 1);
@@ -297,7 +323,7 @@ States.DungeonState.prototype = {
 	//Moves the sword sprite and the sword body in a circular motion each frame
 	swingSword: function(){
 		if (!this.shieldUp) {
-			this.swordLength = this.tileScale / this.swordLength;
+			//this.swordLength = this.swordLength * this.tileScale;
 			if(this.degrees <= this.maxSwingAngle){
 				this.sword.x = this.player.x;
 				this.sword.y = this.player.y;
@@ -310,8 +336,8 @@ States.DungeonState.prototype = {
 				for(var i = 0; i < this.swordBody.length; i++){
 					this.swordBody[i].revive();
 					this.swordBody[i].visible = false;
-					this.swordBody[i].body.x = this.sword.x - (x * this.swordLength * (1 + this.sword.anchor.y) * i / this.swordBody.length);
-					this.swordBody[i].body.y = this.sword.y - (y * this.swordLength * (1 + this.sword.anchor.y) * i / this.swordBody.length);
+					this.swordBody[i].body.x = this.sword.x - (x * this.swordLength * (this.sword.anchor.y) * i / 5);// / this.swordBody.length);
+					this.swordBody[i].body.y = this.sword.y - (y * this.swordLength * (this.sword.anchor.y) * i / 5);// / this.swordBody.length);
 				}
 				this.currentSwing++;
 			}
@@ -343,7 +369,7 @@ States.DungeonState.prototype = {
 		this.shield.kill();
 	},
 
-	//Creats a new map
+	//Creates a new map
 	newMap: function(){
 		
 		if(!this.player.alive)
@@ -360,11 +386,14 @@ States.DungeonState.prototype = {
 		this.player.body.x = this.generator.characterSpawnX * this.tileSize;
 		this.player.body.y = this.game.height - this.generator.characterSpawnY * this.tileSize;
 		
+		this.placeStairs();
 		
 		//TEMPORARY FIX FOR INCORRECT SPAWN LOCATION
-		if(this.gameMap[this.player.body.x/this.tileSize][(this.game.height - this.player.body.y)/this.tileSize] == 1){
+		if(this.gameMap[this.player.body.x/this.tileSize][(this.game.height - this.player.body.y)/this.tileSize] == 1 ){//|| this.gameMap[this.stairs.x/this.tileSize][(this.game.height - this.stairs.y)/this.tileSize] == 1){
 			this.newMap();
 		}
+		
+		
 		
 		//Clear the enemies
 		for(var i = 0; i < this.enemies.length; i++){
@@ -372,13 +401,48 @@ States.DungeonState.prototype = {
 		}
 		
 		//Create new enemies
-		this.enemies = this.spawner.spawnRandom(this.gameMap, 25, 'darkknight', 1, 1);
-		var temp = this.spawner.spawnRandom(this.gameMap, 25, 'bloodknight', 1, 1);
+		this.enemies = this.spawner.spawnRandom(this.gameMap, 25, 'darkknight', 2, 1);
+		var temp = this.spawner.spawnRandom(this.gameMap, 25, 'bloodknight', 2, 1);
 		this.enemies.push.apply(this.enemies, temp);
-		temp = this.spawner.spawnRandom(this.gameMap, 25, 'archer', 1, 1);
+		temp = this.spawner.spawnRandom(this.gameMap, 25, 'archer', 2, 1);
 		this.enemies.push.apply(this.enemies, temp);
+		
+		this.healthbar1.destroy();
+		this.healthbar2.destroy();
+		this.healthbar3.destroy();
+		this.healthbar4.destroy();
+		this.healthbar5.destroy();
+		
+		this.healthbar1 = this.add.image(5, 5, 'healthbar');
+		this.healthbar2 = this.add.image(40, 5, 'healthbar');
+		this.healthbar3 = this.add.image(75, 5, 'healthbar');
+		this.healthbar4 = this.add.image(110, 5, 'healthbar');
+		this.healthbar5 = this.add.image(145, 5, 'healthbar');
+		this.healthbar5.fixedToCamera = true;
+		this.healthbar4.fixedToCamera = true;
+		this.healthbar3.fixedToCamera = true;
+		this.healthbar2.fixedToCamera = true;
+		this.healthbar1.fixedToCamera = true;
+		this.updateHealthBar(this.player.health);
+		
+		this.scoreText.destroy();
+		this.scoreText = this.add.text(1400, 0, "Score: 0", { font: "30px Arial", fill: "#ffffff", align: "right" })
+		this.scoreText.fixedToCamera = true;
+		this.scoreText.text = "Score: " + score;
 	},
-
+	
+	placeStairs : function(){
+		var placed = false;
+		while(!placed){
+			var x = Math.floor(Math.random() * this.width);
+			var y = Math.floor(Math.random() * this.height);
+			if(this.gameMap[x][y] == 0){
+				this.stairs.body.x = x * this.tileSize;
+				this.stairs.body.y = this.game.height - ((y+1) * this.tileSize);
+				placed = true;
+			}
+		}
+	},
 	//Advances to the game over screen
 	gameOver: function() {
 		this.state.start('gameover');

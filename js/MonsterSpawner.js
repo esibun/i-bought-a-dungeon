@@ -25,11 +25,13 @@ MonsterSpawner.prototype.spawn = function(x, y, type, health, damage){
 	sprite.anchor.setTo(0.5, 0.5);
 	sprite.animations.add('walk', [2, 3, 4, 5]);
 	this.game.physics.enable(sprite, Phaser.Physics.ARCADE);
-	var mob = new Character(sprite, health, damage, this.tileSize);
+	sprite.body.setSize(50, 50, 0, this.tileSize/5);
+	var mob = new Character(sprite, health, damage, this.tileSize, this.game);
 	return mob;
 }
 
-Character = function(sprite, health, damage, tileSize){
+Character = function(sprite, health, damage, tileSize, game){
+	this.game = game;
 	this.health = health;
 	this.damage = damage;
 	this.sprite = sprite;
@@ -41,6 +43,10 @@ Character = function(sprite, health, damage, tileSize){
 	
 	this.pathTarget;
 	this.directPath = true;
+	
+	this.knockedBack = false;
+	this.knockbackX;
+	this.knockbackY;
 };
 
 Character.prototype.moveTo = function(target, speed, map){
@@ -70,6 +76,17 @@ Character.prototype.moveTo = function(target, speed, map){
 			this.sprite.game.physics.arcade.moveToXY(this.sprite, target.x, target.y, (speed * 0.9));
 			this.sprite.animations.play('walk', 7, false);
 	//	}
+	}
+	
+	if(this.knockedBack){
+		this.sprite.body.velocity.x = this.knockbackX;
+		this.sprite.body.velocity.y = this.knockbackY;
+		var temp = Math.sqrt(Math.pow(this.knockbackX, 2) + Math.pow(this.knockbackY, 2));
+		this.knockbackX -= this.game.time.physicsElapsed * 2000 *(this.knockbackX/ temp);
+		this.knockbackY -= this.game.time.physicsElapsed * 2000 *(this.knockbackY/ temp);
+		if(this.knockbackX < 10 && this.knockbackY < 10 && this.knockbackX > -10 && this.knockbackY > -10){
+			this.knockedBack = false;
+		}
 	}
 }
 
@@ -108,3 +125,14 @@ Character.prototype.calculateMapPositionY = function(y){
 	var delta = (this.sprite.game.height - y) % this.tileSize;
 	return (this.sprite.game.height - y - delta) / this.tileSize;
 }    
+
+Character.prototype.knockback = function(source, force){
+	var x = this.sprite.x - source.x;
+	var y = this.sprite.y - source.y;
+	var unit = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+	var angle = -Math.atan2(y, x) / Math.PI;
+	this.knockbackX = force * (x/unit);
+	this.knockbackY = force * (y/unit);
+	this.knockedBack = true;
+	
+}
