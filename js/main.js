@@ -6,7 +6,7 @@ window.onload = function() {
 	
 	
 	
-	var game = new Phaser.Game( 1600, 1000, Phaser.CANVAS, 'game', { preload: preload, create: create, update: update } );
+	var game = new Phaser.Game( 1600, 1000, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
 	
 	function preload(){}
 	
@@ -19,4 +19,6 @@ window.onload = function() {
 	}
 	
 	function update(){}
+	
+	function render(){}
 };

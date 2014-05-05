@@ -10,6 +10,10 @@ MapRenderer = function(game, tileSize, tileScale, width, height){
 	this.width = width;
 	this.colliders = new Array();
 	this.wallSprites = new Array();
+	this.shadows;
+	this.shadow;
+	
+	this.lineMap = [];
 	
 	this.floor = new Array();
 		for(var x = this.width-1; x >= 0; x--){
@@ -75,7 +79,7 @@ MapRenderer.prototype.drawScreen = function(player){
     			if(((this.game.height - this.colliders[i].y) / this.tileSize) >= (this.playerMapPositionY - this.renderDistance) && ((this.game.height - this.colliders[i].y) / this.tileSize) <= this.playerMapPositionY + this.renderDistance){
     				if(!this.colliders[i].alive){
     					this.colliders[i].revive();
-    					this.colliders[i].visible = false;
+    					//this.colliders[i].visible = false;
     				}
     			}
     		}
@@ -181,6 +185,7 @@ MapRenderer.prototype.drawWalls = function(map){
     }
     
 MapRenderer.prototype.createColliders = function(wallMap){
+		this.lineMap = new Array();
 		for(var i = 0; i < this.colliders.length; i++){
     		this.colliders[i].body = null;
     		this.colliders[i].destroy();
@@ -204,11 +209,12 @@ MapRenderer.prototype.createColliders = function(wallMap){
 					this.colliders[i].scale.x *= count;
 					this.game.physics.enable(this.colliders[i], Phaser.Physics.ARCADE);
 					this.colliders[i].body.immovable = true;
-					this.colliders[i].visible = false;
+					//this.colliders[i].visible = false;
     				i++;
     			}
     		}
     	}
+		this.lineCastWalls();
     }
     
 MapRenderer.prototype.checkUp = function(wallMap, pos, x, y){
@@ -226,7 +232,7 @@ MapRenderer.prototype.checkUp = function(wallMap, pos, x, y){
 			this.colliders[pos].y -= (this.tileSize * (count-1));
 			this.game.physics.enable(this.colliders[pos], Phaser.Physics.ARCADE);
 			this.colliders[pos].body.immovable = true;
-			this.colliders[pos].visible = false;
+			//this.colliders[pos].visible = false;
 			pos++;
     	}
     	return pos;
@@ -264,6 +270,330 @@ MapRenderer.prototype.clear = function(){
     }
 }
 
-MapRenderer.prototype.clearWalls = function(){
+MapRenderer.prototype.setupShadowLayer = function(){
+	this.shadows = this.game.add.bitmapData(this.game.width, this.game.height);
+	//this.shadows.context.fillStyle = 'rgb(255, 255, 255)';
+	this.shadows.context.strokeStyle = 'rgb(255, 255, 255)';
+	this.shadow = this.game.add.image(0, 0, this.shadows);
+	//this.shadow.fixedToCamera = true;
+	
+	this.shadow.blendMode = Phaser.blendModes.MULTIPLY;
 	
 }
+
+MapRenderer.prototype.createWallLines = function(){
+	this.colliders.forEach(function(wall){
+		var x = wall.x - this.shadow.x;
+		var y = wall.y - this.shadow.y;
+		
+		var lines = [
+			new Phaser.Line(x, y, x + wall.width, y),
+			new Phaser.Line(x, y, x, y + wall.height),
+			new Phaser.Line(x + wall.width, y, x + wall.width, y + wall.height),
+            new Phaser.Line(x, y + wall.height, x + wall.width, y + wall.height) ];
+			
+			
+			
+		this.shadows.context.beginPath();
+		this.shadows.context.moveTo(x, y);
+		this.shadows.context.lineTo(x + wall.width, y);
+		this.shadows.context.stroke();
+			
+		this.shadows.context.beginPath();
+		this.shadows.context.moveTo(x, y);
+		this.shadows.context.lineTo(x, y + wall.height);
+		this.shadows.context.stroke();
+			
+		this.shadows.context.beginPath();
+		this.shadows.context.moveTo(x + wall.width, y);
+		this.shadows.context.lineTo(x + wall.width, y + wall.height);
+		this.shadows.context.stroke();
+			
+		this.shadows.context.beginPath();
+		this.shadows.context.moveTo(x, y + wall.height);
+		this.shadows.context.lineTo(x + wall.width, y + wall.height);
+		this.shadows.context.stroke();
+			
+	}, this);
+}
+
+MapRenderer.prototype.cornerTest = function(emitter){
+	var points = [];
+	var ray = null;
+	var intersect;
+	var source = new Phaser.Point(emitter.x - this.shadow.x, emitter.y - this.shadow.y);
+	this.colliders.forEach(function(wall){
+	if((wall.x / this.tileSize) <= (emitter.x / this.tileSize) + this.renderDistance && (wall.x /this.tileSize) >= (emitter.x / this.tileSize) - this.renderDistance
+		&& (wall.y / this.tileSize) <= (emitter.y / this.tileSize) + this.renderDistance && (wall.y / this.tileSize) >= (emitter.y/this.tileSize) - this.renderDistance){
+		var x = wall.x - this.shadow.x;
+		var y = wall.y - this.shadow.y;
+		var corners = [
+			new Phaser.Point(x + 0.1, y + 0.1),
+			new Phaser.Point(x - 0.1, y - 0.1),
+		
+			new Phaser.Point(x + 0.1, y + wall.height + 0.1),
+			new Phaser.Point(x - 0.1, y + wall.height - 0.1),
+		
+			new Phaser.Point(x + wall.width + 0.1, y + 0.1),
+			new Phaser.Point(x + wall.width + 0.1, y + 0.1),
+		
+			new Phaser.Point(x + wall.width + 0.1, y + wall.height + 0.1),
+			new Phaser.Point(x + wall.width - 0.1, y + wall.height - 0.1) ];
+	
+	
+	for(var i = 0; i < corners.length; i++){
+		var c = corners[i];
+		
+		var slope = (c.y - source.y) / (c.x - source.x);
+		var b = source.y - slope * source.x;
+		var end = null;
+		
+		if(c.x === source.x){
+			if(c.y <= source.y){
+				end = new Phaser.Point(source.x, 0);
+			}
+			else {
+				end = new Phaser.Point(source.x, this.game.height);
+			}
+		}
+		else if(c.y === source.y){
+			if(c.x <= source.x){
+				end = new Phaser.Point(0, source.y);
+			}
+			else{
+				end = new Phaser.Point(this.game.width, source.y);
+			}
+		}
+		else{
+			var left = new Phaser.Point(0,b);
+			var right = new Phaser.Point(this.game.width, slope * this.game.width + b);
+			var top = new Phaser.Point(-b/slope,0);
+			var bottom = new Phaser.Point((this.game.height-b)/slope, this.game.height);
+			
+			if(c.y <= source.y && c.x >= source.x){
+				if(top.x >= 0 && top.x <= this.game.width){
+					end = top;
+				}
+				else {
+					end = right;
+				}
+			}
+			else if(c.y <= source.y && c.x <= source.x){
+				if(top.x >= 0 && top.x <= this.game.width){
+					end = top;
+				}
+				else {
+					end = left;
+				}
+			}
+			else if(c.y >= source.y && c.x >= source.x){
+				if(bottom.x >= 0 && bottom.x <= this.game.width){
+					end = bottom;
+				}
+				else {
+					end = right;
+				}
+			}
+			else if(c.y >= source.y && c.x <= source.x){
+				if(bottom.x >= 0 && bottom.x <= this.game.width){
+					end = bottom;
+				}
+				else {
+					end = left;
+				}
+			}
+		}
+		
+		
+		ray = new Phaser.Line(source.x, source.y, end.x, end.y);
+		intersect = this.getWallIntersection(ray, emitter);
+		
+		if(intersect){
+			points.push(intersect);
+		}
+		else{
+			points.push(ray.end);
+		}
+		
+	/*	var x = source.x;// - this.shadow.x;
+		var y = source.y;// - this.shadow.y;
+		var a = end.x;// - this.shadow.x;
+		var b = end.y;// - this.shadow.y;
+		
+		this.shadows.context.beginPath();
+		this.shadows.context.moveTo(x, y);
+		this.shadows.context.lineTo(a, b);
+		this.shadows.context.stroke();*/
+		}
+	}
+	}, this);
+	
+	var stageCorners = [
+		new Phaser.Point(0, 0),
+		new Phaser.Point(this.game.width, 0),
+		new Phaser.Point(this.game.width, this.game.height),
+		new Phaser.Point(0, this.game.height) ];
+	
+	//Fill entire area
+	this.shadows.context.beginPath();
+	this.shadows.context.fillStyle = 'rgb(0, 0, 0)';
+	this.shadows.context.moveTo(stageCorners[0].x, stageCorners[0].y);
+	for(var i = 0; i < stageCorners.length; i++){
+		this.shadows.context.lineTo(stageCorners[i].x, stageCorners[i].y);
+	}
+	this.shadows.context.closePath();
+	//this.shadows.context.fill();
+	var gradient = this.shadows.context.createRadialGradient(source.x, source.y, 0, source.x, source.y, 600)
+	gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+	gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+	this.shadows.context.fill();
+	this.shadows.context.fillStyle = gradient;
+	this.shadows.context.fill();
+	
+	for(var i = 0; i < stageCorners.length; i++){
+		ray = new Phaser.Line(source.x, source.y, stageCorners[i].x, stageCorners[i].y);
+		intersect = this.getWallIntersection(ray, emitter);
+		
+		if(!intersect){
+			points.push(stageCorners[i]);
+		}
+		
+	/*	var x = source.x;
+		var y = source.y;
+		var a = stageCorners[i].x;
+		var b = stageCorners[i].y;
+		
+		this.shadows.context.beginPath();
+		this.shadows.context.moveTo(x, y);
+		this.shadows.context.lineTo(a, b);
+		this.shadows.context.stroke();*/
+	}
+	
+	var center = { x: source.x, y: source.y };
+	points = points.sort(function(a,b){
+		if(a.x - center.x >= 0 && b.x - center.x < 0)
+			return 1;
+		if(a.x - center.x < 0 && b.x - center.x >= 0)
+			return -1;
+		if(a.x - center.x === 0 && b.x - center.x === 0){
+			if(a.y - center.y >= 0 || b.y - center.y >= 0)
+				return 1;
+			return -1;
+		}
+		
+		var det = (a.x - center.x) * (b.y - center.y) - (b.x - center.x) * (a.y - center.y);
+		if(det < 0)
+			return 1;
+		if(det > 0)
+			return -1;
+			
+		var d1 = (a.x - center.x) * (a.x - center.x) + (a.y - center.y) * (a.y - center.y);
+		var d2 = (b.x - center.x) * (b.x - center.x) + (b.y - center.y) * (b.y - center.y);
+		return 1;
+	});
+	
+	this.shadows.context.beginPath();
+	this.shadows.context.fillStyle = 'rgb(255, 255, 255)';
+	this.shadows.context.moveTo(points[0].x, points[0].y);
+	for(var i = 0; i < points.length; i++){
+		this.shadows.context.lineTo(points[i].x, points[i].y);
+	}
+	this.shadows.context.closePath();
+	var t = this.shadows.context.createRadialGradient(source.x, source.y, 100, source.x, source.y, 500);
+	t.addColorStop(0, 'rgba(255, 255, 255, 1)');
+	t.addColorStop(1, 'rgba(255, 255, 255, 0)');
+	this.shadows.context.fillStyle = t;
+	this.shadows.context.fill();
+	
+	
+	
+	this.shadows.dirty = true;
+	this.shadows.render();
+}
+
+MapRenderer.prototype.getWallIntersection = function(ray, emitter){
+	var distanceToWall = Number.POSITIVE_INFINITY;
+	var closestIntersection = null;
+	
+	this.colliders.forEach(function(wall){
+	
+		if((wall.x / this.tileSize) <= (emitter.x / this.tileSize) + this.renderDistance && (wall.x /this.tileSize) >= (emitter.x / this.tileSize) - this.renderDistance
+		&& (wall.y / this.tileSize) <= (emitter.y / this.tileSize) + this.renderDistance && (wall.y / this.tileSize) >= (emitter.y/this.tileSize) - this.renderDistance){
+
+			var x = wall.x - this.game.camera.x;
+			var y = wall.y - this.game.camera.y;
+		
+			var lines = [
+				new Phaser.Line(x, y, x + wall.width, y),
+				new Phaser.Line(x, y, x, y + wall.height),
+				new Phaser.Line(x + wall.width, y, x + wall.width, y + wall.height),
+				new Phaser.Line(x, y + wall.height, x + wall.width, y + wall.height) ];
+			
+			for(var i = 0; i < lines.length; i++){
+				var intersect = Phaser.Line.intersects(ray, lines[i]);
+				if(intersect){
+					distance = this.game.math.distance(ray.start.x, ray.start.y, intersect.x, intersect.y);
+					
+					if(distance < distanceToWall){
+						distanceToWall = distance;
+						closestIntersection = intersect;
+					}
+				}
+			}
+		}
+	}, this);
+	
+	return closestIntersection;
+}
+
+MapRenderer.prototype.raycast = function(ray, emitter){
+	var distanceToWall = Number.POSITIVE_INFINITY;
+	var closestIntersection = null;
+	
+		
+		for(var i = 0; i < this.lineMap.length; i++){
+			if((this.lineMap[i].x / this.tileSize) <= (emitter.x / this.tileSize) + this.renderDistance && (this.lineMap[i].x /this.tileSize) >= (emitter.x / this.tileSize) - this.renderDistance
+			&& (this.lineMap[i].y / this.tileSize) <= (emitter.y / this.tileSize) + this.renderDistance && (this.lineMap[i].y / this.tileSize) >= (emitter.y/this.tileSize) - this.renderDistance){
+				var intersect = Phaser.Line.intersects(ray, this.lineMap[i]);
+				if(intersect){
+					distance = this.game.math.distance(ray.start.x, ray.start.y, intersect.x, intersect.y);
+						
+					if(distance < distanceToWall){
+						distanceToWall = distance;
+						closestIntersection = intersect;
+					}
+				}
+			}
+		}
+	return closestIntersection;
+}
+
+MapRenderer.prototype.lineCastWalls = function(){
+	this.colliders.forEach(function(wall){
+
+			var x = wall.x;
+			var y = wall.y;
+		
+			this.lineMap.push(new Phaser.Line(x, y, x + wall.width, y));
+			this.lineMap.push(new Phaser.Line(x, y, x, y + wall.height));
+			this.lineMap.push(new Phaser.Line(x + wall.width, y, x + wall.width, y + wall.height));
+			this.lineMap.push(new Phaser.Line(x, y + wall.height, x + wall.width, y + wall.height));
+				
+	}, this);
+}
+
+MapRenderer.prototype.shadowUpdate = function(source){
+	this.shadows.context.clearRect(0,0, this.game.width, this.game.height);
+	this.shadow.x = this.game.camera.x;
+	this.shadow.y = this.game.camera.y;
+
+	//this.shadows.x = this.game.camera.x;
+	//this.shadows.y = this.game.camera.y;
+	
+	//this.createWallLines();
+	this.cornerTest(source);
+	
+	//this.shadows.alphaMask(this.shadow, this.blackPic);
+	
+}
+

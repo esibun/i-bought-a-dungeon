@@ -74,11 +74,14 @@ States.DungeonState.prototype = {
 		this.load.image('invisible', 'assets/invisibleWall.png');
 		this.load.image('sword', 'assets/sword.png');
 		this.load.image('shield', 'assets/shield.png');
+		this.load.image('arrow', 'assets/arrow.png');
+		this.load.image('mageball', 'assets/mageball.png');
 		this.load.spritesheet('healthbar', 'assets/health_bar.png', 35, 32, 6);
 		this.load.spritesheet('player', 'assets/playercharacter.png', 51, 70, 6);
 		this.load.spritesheet('darkknight', 'assets/darkknight.png', 50, 70, 6);
 		this.load.spritesheet('archer', 'assets/archer.png', 50, 70, 6);
 		this.load.spritesheet('bloodknight', 'assets/bloodknight.png', 50, 70, 6);
+		this.load.spritesheet('mage', 'assets/ghostmage.png', 54, 70, 6);
 		
 		this.load.audio('swing', 'assets/Swoosh.mp3');
 	},
@@ -105,7 +108,6 @@ States.DungeonState.prototype = {
 		//New generator (max room size, minimum room size)
 		this.generator = new Map(10, 1);
 		this.mapRenderer = new MapRenderer(this.game, this.tileSize, this.tileScale, this.width, this.height);
-		
 		
 		//Setup sword sprite
 		this.sword = this.add.sprite(0, 0, 'sword');
@@ -152,7 +154,7 @@ States.DungeonState.prototype = {
 		this.player.scale.y *= this.tileScale/2;
 		this.player.anchor.setTo(0.5, 0.5);
 		this.physics.enable(this.player, Phaser.Physics.ARCADE);
-		this.player.body.setSize(51, 51, 0, this.tileSize/5);
+		this.player.body.setSize(51, 51, 0, 0);
 		
 		//Setup health bar
 		this.healthbar1 = this.add.image(5, 5, 'healthbar');
@@ -203,9 +205,12 @@ States.DungeonState.prototype = {
 		score = 0;
 		
 		this.swordLength = this.swordSpriteLength * this.tileScale;
+		
+		
 	},
 	
 	update: function() {
+		//this.mapRenderer.shadowUpdate(this.player);
 		if(this.damageTimer >= 0)
 			this.damageTimer -= this.time.physicsElapsed;
 	
@@ -263,8 +268,13 @@ States.DungeonState.prototype = {
 		
 		//Enemy movement and collision with player
 		for(var i = 0; i < this.enemies.length; i++){
-			this.enemies[i].moveTo(this.player, this.speed, this.gameMap);
+			var proj = this.enemies[i].update(this.player, this.speed, this.gameMap);
 			this.physics.arcade.overlap(this.enemies[i].sprite, this.player, this.takeDamage, null, this);
+			
+			this.physics.arcade.collide(this.player, proj, this.takeDamage, this.killProjectile, this);
+			
+			for(var j = 0; j < this.mapRenderer.colliders.length; j++)
+				this.physics.arcade.collide(this.mapRenderer.colliders[j], proj, null, this.killProjectile, this);
 		}
 		
 		//Enemy collisions (sword and walls)
@@ -295,12 +305,14 @@ States.DungeonState.prototype = {
 		this.scoreText.text = "Score: " + score;
 	},
 	
-/*	render: function(){
+	/*render: function(){
 		this.game.debug.body(this.player);
 		for(var i = 0; i < this.enemies.length; i++)
 			this.game.debug.body(this.enemies[i].sprite);
 		for(var i = 0; i < this.swordBody.length; i++)
 			this.game.debug.body(this.swordBody[i]);
+		for(var i = 0; i < this.mapRenderer.colliders.length; i++){}
+			this.game.debug.body(this.mapRenderer.colliders[i]);
 	},*/
 	
 	//Unfinished
@@ -401,11 +413,15 @@ States.DungeonState.prototype = {
 		}
 		
 		//Create new enemies
-		this.enemies = this.spawner.spawnRandom(this.gameMap, 25, 'darkknight', 2, 1);
-		var temp = this.spawner.spawnRandom(this.gameMap, 25, 'bloodknight', 2, 1);
+		this.enemies = this.spawner.spawnRandom(this.gameMap, 25, 'darkknight', 2, 1, this.mapRenderer, this.player.body);
+		var temp = this.spawner.spawnRandom(this.gameMap, 25, 'bloodknight', 2, 1, this.mapRenderer, this.player.body);
 		this.enemies.push.apply(this.enemies, temp);
-		temp = this.spawner.spawnRandom(this.gameMap, 25, 'archer', 2, 1);
+		temp = this.spawner.spawnRandom(this.gameMap, 25, 'archer', 1, 1, this.mapRenderer, this.player.body);
 		this.enemies.push.apply(this.enemies, temp);
+		temp = this.spawner.spawnRandom(this.gameMap, 25, 'mage', 1, 1, this.mapRenderer, this.player.body);
+		this.enemies.push.apply(this.enemies, temp);
+		
+		//this.mapRenderer.setupShadowLayer();
 		
 		this.healthbar1.destroy();
 		this.healthbar2.destroy();
@@ -429,6 +445,8 @@ States.DungeonState.prototype = {
 		this.scoreText = this.add.text(1400, 0, "Score: 0", { font: "30px Arial", fill: "#ffffff", align: "right" })
 		this.scoreText.fixedToCamera = true;
 		this.scoreText.text = "Score: " + score;
+		
+		
 	},
 	
 	placeStairs : function(){
@@ -443,6 +461,11 @@ States.DungeonState.prototype = {
 			}
 		}
 	},
+	
+	killProjectile : function(wall, proj){
+		proj.kill();
+	},
+	
 	//Advances to the game over screen
 	gameOver: function() {
 		this.state.start('gameover');
