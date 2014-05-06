@@ -275,12 +275,9 @@ States.DungeonState.prototype = {
 			
 			for(var j = 0; j < this.mapRenderer.colliders.length; j++)
 				this.physics.arcade.collide(this.mapRenderer.colliders[j], proj, null, this.killProjectile, this);
-		}
 
-		//Enemy collisions (walls)
-		for ( iter = 0; iter < this.enemies.length; iter++ ) {
 			for(var x = 0; x < this.mapRenderer.colliders.length; x++){
-						this.physics.arcade.collide(this.enemies[iter].sprite, this.mapRenderer.colliders[x], null, null, this);
+				this.physics.arcade.collide(this.enemies[i].sprite, this.mapRenderer.colliders[x], null, null, this);
 			}
 		}
 
