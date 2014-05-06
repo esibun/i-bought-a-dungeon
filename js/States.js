@@ -59,7 +59,7 @@ States.DungeonState = function(game){
 		
 	this.damageTimer = 0;
 
-	this.keye;
+	this.keyspace;
 	
 	this.degrees = 1;
 	this.maxSwingAngle = 135;
@@ -209,9 +209,9 @@ States.DungeonState.prototype = {
 		//this.footsteps.addMarker('step', 0, 0.1, 0.4, false);
 
 		//Add shield keybinding
-		this.keye = this.input.keyboard.addKey(Phaser.Keyboard.E);
-		this.keye.onDown.add(this.raiseShield, this);
-		this.keye.onUp.add(this.lowerShield, this);
+		this.keyspace = this.input.keyboard.addKey(Phaser.Keyboard.SPACE);
+		this.keyspace.onDown.add(this.raiseShield, this);
+		this.keyspace.onUp.add(this.lowerShield, this);
 		
 		//Game over state
 		this.player.events.onKilled.add(this.gameOver, this);
