@@ -51,8 +51,7 @@ States.DungeonState = function(game){
 	this.scoreText;
 		
 	this.damageTimer = 0;
-		
-	this.key1;
+
 	this.keye;
 	
 	this.degrees = 1;
@@ -188,14 +187,9 @@ States.DungeonState.prototype = {
 		this.player.animations.add('walk', [2, 3, 4, 5]);
 		this.player.animations.add('idle', [0]);
 		this.player.animations.add('attack', [1]);
-
-		
 		this.swingSound = this.add.sound('swing');
 
-		
-		this.key1 = this.input.keyboard.addKey(Phaser.Keyboard.ONE);
-		//this.key1.onDown.add(this.newMap, this);
-
+		//Add shield keybinding
 		this.keye = this.input.keyboard.addKey(Phaser.Keyboard.E);
 		this.keye.onDown.add(this.raiseShield, this);
 		this.keye.onUp.add(this.lowerShield, this);
