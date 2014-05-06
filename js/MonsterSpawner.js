@@ -153,10 +153,32 @@ Character.prototype.moveTo = function(target, speed, map){
 		}
 		
 		if(this.directPath){*/
-			this.sprite.rotation = this.sprite.game.physics.arcade.angleToXY(this.sprite, target.x, target.y);
+			
+	//	}
+		this.sprite.rotation = this.sprite.game.physics.arcade.angleToXY(this.sprite, target.x, target.y);
+		
+		var ray = new Phaser.Line(this.sprite.x, this.sprite.y, target.x, target.y);
+		var intersection = this.mapRenderer.raycast(ray, this.sprite);
+		var right = this.raycastRight();
+		var left = this.raycastLeft();
+		if(!right && !left){
 			this.sprite.game.physics.arcade.moveToXY(this.sprite, target.x, target.y, (speed * 0.9));
 			this.sprite.animations.play('walk', 7, false);
-	//	}
+		}
+		else if(right){
+			var y =	speed * Math.sin((this.sprite.angle + 45) * Math.PI / 180);
+			var x = speed * Math.cos((this.sprite.angle + 45) * Math.PI / 180);
+			
+			this.sprite.body.velocity.x = x;
+			this.sprite.body.velocity.y = y;
+		}
+		else if(left){
+			var y =	speed * Math.sin((this.sprite.angle - 45) * Math.PI / 180);
+			var x = speed * Math.cos((this.sprite.angle - 45) * Math.PI / 180);
+			
+			this.sprite.body.velocity.x = x;
+			this.sprite.body.velocity.y = y;
+		}
 	
 	
 	if(this.knockedBack){
@@ -224,8 +246,12 @@ Character.prototype.shootProjectile = function(target, velocity){
 	var arrow = this.projectiles.getFirstDead();
 	arrow.revive();
 	arrow.lifespan = 5000;
-	arrow.x = this.sprite.x;
-	arrow.y = this.sprite.y;
+	
+	var y =	this.tileSize * this.tileScale / 5 * Math.sin((this.sprite.angle) * Math.PI / 180);
+	var x = this.tileSize * this.tileScale / 5 * Math.cos((this.sprite.angle) * Math.PI / 180);
+	
+	arrow.x = this.sprite.x + x;
+	arrow.y = this.sprite.y + y;
 
 	arrow.rotation = this.sprite.game.physics.arcade.angleToXY(arrow, target.x, target.y);
 	var x = target.x - arrow.x;
@@ -240,12 +266,12 @@ Character.prototype.shootProjectile = function(target, velocity){
 
 Character.prototype.keepAtDistance = function(target, speed, distance){
 	var dist = this.game.math.distance(this.sprite.x, this.sprite.y, target.x, target.y) / speed;
-	if(this.type == 'archer'){ 
+/*	if(this.type == 'archer'){ 
 		speed *= 0.4; 
 	} 
 	else if( this.type == 'mage'){ 
 		speed *= 0.25;
-	}
+	}*/
 	
 	if(dist > distance + 0.1){
 		this.moveTo(target, speed);
@@ -270,6 +296,7 @@ Character.prototype.keepAtDistance = function(target, speed, distance){
 }
 
 Character.prototype.archerUpdate = function(target, speed){
+	speed *= 0.4;
 	this.keepAtDistance(target, speed, 0.8);
 	if(this.attackTimer <= 0){
 		this.weapon.revive();
@@ -281,10 +308,26 @@ Character.prototype.archerUpdate = function(target, speed){
 		this.weapon.visible = true;
 		var ray = new Phaser.Line(this.sprite.x, this.sprite.y, target.x, target.y);
 		var intersection = this.mapRenderer.raycast(ray, this.sprite);
-		if(!intersection){
+		var right = this.raycastRight();
+		var left = this.raycastLeft();
+		if(!intersection && !right && !left){
 			this.shootProjectile(target, 300);
 			this.attackTimer = this.attackSpeed;
 			this.bowShotSound.play();
+		}
+		else if(right){
+			var y =	speed * Math.sin((this.sprite.angle + 45) * Math.PI / 180);
+			var x = speed * Math.cos((this.sprite.angle + 45) * Math.PI / 180);
+			
+			this.sprite.body.velocity.x = x;
+			this.sprite.body.velocity.y = y;
+		}
+		else if(left){
+			var y =	speed * Math.sin((this.sprite.angle - 45) * Math.PI / 180);
+			var x = speed * Math.cos((this.sprite.angle - 45) * Math.PI / 180);
+			
+			this.sprite.body.velocity.x = x;
+			this.sprite.body.velocity.y = y;
 		}
 	}
 	else{
@@ -296,6 +339,7 @@ Character.prototype.archerUpdate = function(target, speed){
 }
 
 Character.prototype.mageUpdate = function(target, speed){
+	speed *= 0.25
 	this.keepAtDistance(target, speed, 1.25);
 	if(this.attackTimer <= 0){
 		this.weapon.revive();
@@ -306,10 +350,26 @@ Character.prototype.mageUpdate = function(target, speed){
 	
 		var ray = new Phaser.Line(this.sprite.x, this.sprite.y, target.x, target.y);
 		var intersection = this.mapRenderer.raycast(ray, this.sprite);
-		if(!intersection){
+		var right = this.raycastRight();
+		var left = this.raycastLeft();
+		if(!intersection && !right && !left){
 			this.shootProjectile(target, 300);
 			this.attackTimer = this.attackSpeed;
 			this.mageBallSound.play('', 0, 0.5);
+		}
+		else if(right){
+			var y =	speed * Math.sin((this.sprite.angle + 45) * Math.PI / 180);
+			var x = speed * Math.cos((this.sprite.angle + 45) * Math.PI / 180);
+			
+			this.sprite.body.velocity.x = x;
+			this.sprite.body.velocity.y = y;
+		}
+		else if(left){
+			var y =	speed * Math.sin((this.sprite.angle - 45) * Math.PI / 180);
+			var x = speed * Math.cos((this.sprite.angle - 45) * Math.PI / 180);
+			
+			this.sprite.body.velocity.x = x;
+			this.sprite.body.velocity.y = y;
 		}
 	}
 	else{
@@ -318,5 +378,33 @@ Character.prototype.mageUpdate = function(target, speed){
 		this.weapon.y = this.sprite.y;
 		this.attackTimer -= this.game.time.physicsElapsed;
 	}
+}
+
+Character.prototype.raycastLeft = function(){
+	var y =	(this.tileSize * this.tileScale / 2) * Math.sin((this.sprite.angle + 45) * Math.PI / 180);
+	var x = (this.tileSize * this.tileScale / 2) * Math.cos((this.sprite.angle + 45) * Math.PI / 180);
+	
+	var ray = new Phaser.Line(this.sprite.x, this.sprite.y, this.sprite.x + x, this.sprite.y + y);
+	var intersection = this.mapRenderer.raycast(ray, this.sprite);
+	
+	var hit = false;
+	if(intersection)
+		hit = true;
+	
+	return hit;
+}
+
+Character.prototype.raycastRight = function(){
+	var y =	(this.tileSize * this.tileScale / 2) * Math.sin((this.sprite.angle - 45) * Math.PI / 180);
+	var x = (this.tileSize * this.tileScale / 2) * Math.cos((this.sprite.angle - 45) * Math.PI / 180);
+	
+	var ray = new Phaser.Line(this.sprite.x, this.sprite.y, this.sprite.x + x, this.sprite.y + y);
+	var intersection = this.mapRenderer.raycast(ray, this.sprite);
+	
+	var hit = false;
+	if(intersection)
+		hit = true;
+		
+	return hit;
 }
 
