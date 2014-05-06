@@ -49,6 +49,11 @@ States.DungeonState = function(game){
 	this.swingSound;
 	this.mapRenderer;
 	this.scoreText;
+	this.hurtSound;
+	this.clangSound;
+	this.arrowHitSound;
+	//this.footsteps;
+	//this.footstepsTimer = 0;
 
 	this.floor = 1;
 		
@@ -79,6 +84,7 @@ States.DungeonState.prototype = {
 		this.load.image('mageball', 'assets/mageball.png');
 		this.load.image('bow', 'assets/bow.png');
 		this.load.image('magearm', 'assets/mage_arm.png');
+		
 		this.load.spritesheet('healthbar', 'assets/health_bar.png', 35, 32, 6);
 		this.load.spritesheet('player', 'assets/playercharacter.png', 51, 70, 6);
 		this.load.spritesheet('darkknight', 'assets/darkknight.png', 50, 70, 6);
@@ -87,6 +93,13 @@ States.DungeonState.prototype = {
 		this.load.spritesheet('mage', 'assets/ghostmage.png', 54, 70, 6);
 		
 		this.load.audio('swing', 'assets/Swoosh.mp3');
+		this.load.audio('arrowHit', 'assets/arrowHit.wav');
+		this.load.audio('bowShot', 'assets/BowShot.wav');
+		this.load.audio('hurt', 'assets/Character Hurt.wav');
+		this.load.audio('footstep', 'assets/footstep.wav');
+		this.load.audio('mageBallSound', 'assets/Mage ball.wav');
+		this.load.audio('monsterSound1', 'assets/Monster Sound 1.wav');
+		this.load.audio('swordClang', 'assets/Sword Clang.wav');
 	},
 	
 	create: function() {
@@ -190,6 +203,10 @@ States.DungeonState.prototype = {
 		this.player.animations.add('idle', [0]);
 		this.player.animations.add('attack', [1]);
 		this.swingSound = this.add.sound('swing');
+		this.hurtSound = this.add.sound('hurt');
+		this.arrowHitSound = this.add.sound('arrowHit');
+		//this.footsteps = this.add.sound('footstep');
+		//this.footsteps.addMarker('step', 0, 0.1, 0.4, false);
 
 		//Add shield keybinding
 		this.keye = this.input.keyboard.addKey(Phaser.Keyboard.E);
@@ -211,7 +228,9 @@ States.DungeonState.prototype = {
 		//this.mapRenderer.shadowUpdate(this.player);
 		if(this.damageTimer >= 0)
 			this.damageTimer -= this.time.physicsElapsed;
-	
+		//if(this.footstepsTimer >= 0)
+		//	this.footstepsTimer -= this.time.physicsElapsed;
+			
 		//PLAYER MOVEMENT
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
@@ -237,6 +256,10 @@ States.DungeonState.prototype = {
 		//Walk animation
 		if(this.player.body.velocity.y != 0 || this.player.body.velocity.x != 0){
 			this.player.animations.play('walk', 7, false);
+			//if(this.footstepsTimer <= 0){
+			//	this.footsteps.play('step');
+			//	this.footstepsTimer = 0.3;
+			//}
 		}
 		else{
 			this.player.animations.play('idle');
@@ -326,7 +349,8 @@ States.DungeonState.prototype = {
 	takeDamage: function(){
 		if(this.damageTimer <= 0 && !this.shieldUp){
 			this.player.damage(1);
-			this.damageTimer = 0.5;
+			this.damageTimer = 0.75;
+			this.hurtSound.play( '', .2, .2);
 		}
 		this.updateHealthBar(this.player.health);
 	},
@@ -467,6 +491,7 @@ States.DungeonState.prototype = {
 	
 	killProjectile : function(wall, proj){
 		proj.kill();
+		this.arrowHitSound.play('', .2, .2);
 	},
 	
 	//Advances to the game over screen

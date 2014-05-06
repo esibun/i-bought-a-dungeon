@@ -58,6 +58,9 @@ Character = function(sprite, health, damage, tileSize, tileScale, game, type, ma
 	this.knockbackX;
 	this.knockbackY;
 	
+	this.clangSound = this.game.add.sound('swordClang');
+	this.aggroed = false;
+	
 	this.attackTimer = 0;
 	this.attackSpeed = 2;
 	
@@ -80,6 +83,8 @@ Character = function(sprite, health, damage, tileSize, tileScale, game, type, ma
 		this.projectiles.setAll('lifespan', 6);
 		//this.projectiles.setAll('alive', false);
 		this.projectiles.forEach(function(sprite){ game.physics.enable(sprite, Phaser.Physics.ARCADE); });
+		
+		this.bowShotSound = this.game.add.sound('bowShot');
 	}
 	else if(this.type == 'mage'){
 		this.weapon = this.game.add.sprite(0, 0, 'magearm');
@@ -97,6 +102,11 @@ Character = function(sprite, health, damage, tileSize, tileScale, game, type, ma
 		this.projectiles.setAll('scale.y', this.tileScale / 2);
 		this.projectiles.setAll('lifespan', 6);
 		this.projectiles.forEach(function(sprite){ game.physics.enable(sprite, Phaser.Physics.ARCADE); });
+		
+		this.mageBallSound = this.game.add.sound('mageBallSound');
+	}
+	else if(this.type == 'bloodknight' || this.type == 'darkknight'){
+		this.aggroSound = this.game.add.sound('monsterSound1');
 	}
 };
 
@@ -117,7 +127,10 @@ Character.prototype.update = function(target, speed, map){
 		}
 		else{
 			this.moveTo(target, speed, map);
+			if(!this.aggroed)
+				this.aggroSound.play('', Math.random()/2, 0.5);
 		}
+		this.aggroed = true;
 	}
 	
 	return this.projectiles;
@@ -151,7 +164,6 @@ Character.prototype.moveTo = function(target, speed, map){
 		var temp = Math.sqrt(Math.pow(this.knockbackX, 2) + Math.pow(this.knockbackY, 2));
 		this.knockbackX -= this.game.time.physicsElapsed * 2000 *(this.knockbackX/ temp);
 		this.knockbackY -= this.game.time.physicsElapsed * 2000 *(this.knockbackY/ temp);
-		console.log(this.knockbackX + " " + this.knockbackY);
 		if(this.knockbackX < 30 && this.knockbackY < 30 && this.knockbackX > -30 && this.knockbackY > -30){
 			this.knockedBack = false;
 		}
@@ -161,6 +173,7 @@ Character.prototype.moveTo = function(target, speed, map){
 
 Character.prototype.takeDamage =  function(amount){
 	if(this.lastTimeTakingDamage < this.sprite.game.time.now - 500){
+		this.clangSound.play('', .2);
 		this.lastTimeTakingDamage = this.sprite.game.time.now;
 		this.health -= amount;
 		if(this.health <= 0)
@@ -270,6 +283,7 @@ Character.prototype.archerUpdate = function(target, speed){
 		if(!intersection){
 			this.shootProjectile(target, 300);
 			this.attackTimer = this.attackSpeed;
+			this.bowShotSound.play();
 		}
 	}
 	else{
@@ -294,6 +308,7 @@ Character.prototype.mageUpdate = function(target, speed){
 		if(!intersection){
 			this.shootProjectile(target, 300);
 			this.attackTimer = this.attackSpeed;
+			this.mageBallSound.play('', 0, 0.5);
 		}
 	}
 	else{
