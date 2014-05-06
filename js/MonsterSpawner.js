@@ -381,8 +381,8 @@ Character.prototype.mageUpdate = function(target, speed){
 }
 
 Character.prototype.raycastLeft = function(){
-	var y =	(this.tileSize * this.tileScale / 2) * Math.sin((this.sprite.angle + 45) * Math.PI / 180);
-	var x = (this.tileSize * this.tileScale / 2) * Math.cos((this.sprite.angle + 45) * Math.PI / 180);
+	var y =	(this.tileSize * this.tileScale / 3) * Math.sin((this.sprite.angle + 45) * Math.PI / 180);
+	var x = (this.tileSize * this.tileScale / 3) * Math.cos((this.sprite.angle + 45) * Math.PI / 180);
 	
 	var ray = new Phaser.Line(this.sprite.x, this.sprite.y, this.sprite.x + x, this.sprite.y + y);
 	var intersection = this.mapRenderer.raycast(ray, this.sprite);
@@ -395,8 +395,8 @@ Character.prototype.raycastLeft = function(){
 }
 
 Character.prototype.raycastRight = function(){
-	var y =	(this.tileSize * this.tileScale / 2) * Math.sin((this.sprite.angle - 45) * Math.PI / 180);
-	var x = (this.tileSize * this.tileScale / 2) * Math.cos((this.sprite.angle - 45) * Math.PI / 180);
+	var y =	(this.tileSize * this.tileScale / 3) * Math.sin((this.sprite.angle - 45) * Math.PI / 180);
+	var x = (this.tileSize * this.tileScale / 3) * Math.cos((this.sprite.angle - 45) * Math.PI / 180);
 	
 	var ray = new Phaser.Line(this.sprite.x, this.sprite.y, this.sprite.x + x, this.sprite.y + y);
 	var intersection = this.mapRenderer.raycast(ray, this.sprite);
