@@ -49,6 +49,8 @@ States.DungeonState = function(game){
 	this.swingSound;
 	this.mapRenderer;
 	this.scoreText;
+
+	this.floor = 1;
 		
 	this.damageTimer = 0;
 
@@ -381,6 +383,12 @@ States.DungeonState.prototype = {
 	//Creates a new map
 	newMap: function(){
 		
+		this.floor++;
+
+		if ( this.floor > 10 ) {
+			this.state.start('youwin');
+		}
+
 		if(!this.player.alive)
 			this.player.revive(5);
 		
@@ -442,8 +450,6 @@ States.DungeonState.prototype = {
 		this.scoreText = this.add.text(1400, 0, "Score: 0", { font: "30px Arial", fill: "#ffffff", align: "right" })
 		this.scoreText.fixedToCamera = true;
 		this.scoreText.text = "Score: " + score;
-		
-		
 	},
 	
 	placeStairs : function(){
@@ -530,5 +536,17 @@ States.LoseState.prototype = {
 
 	startGame: function() {
 		this.state.start('dungeon');
+	}
+}
+States.WinState = function(game){
+}
+States.WinState.prototype = {
+	preload: function() {
+		this.load.image('background', 'assets/win_screen.png');
+	},
+
+	create: function() {
+		this.add.sprite(0, 0, 'background');
+		this.add.text(550, 450, "Final Score: " + score, { font: "80px Arial", fill: "#ffffff", align: "left" })
 	}
 }
