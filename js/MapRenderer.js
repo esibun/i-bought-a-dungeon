@@ -277,7 +277,7 @@ MapRenderer.prototype.setupShadowLayer = function(){
 	this.shadow = this.game.add.image(0, 0, this.shadows);
 	//this.shadow.fixedToCamera = true;
 	
-	this.shadow.blendMode = Phaser.blendModes.MULTIPLY;
+	//this.shadow.blendMode = Phaser.blendModes.MULTIPLY;
 	
 }
 
@@ -443,10 +443,11 @@ MapRenderer.prototype.cornerTest = function(emitter){
 	}
 	this.shadows.context.closePath();
 	//this.shadows.context.fill();
-	var gradient = this.shadows.context.createRadialGradient(source.x, source.y, 0, source.x, source.y, 600)
-	gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-	gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-	this.shadows.context.fill();
+	var b = Math.random() * 10;
+	var gradient = this.shadows.context.createRadialGradient(source.x, source.y, 0, source.x, source.y, 450 + b)
+	gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+	gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
+	//this.shadows.context.fill();
 	this.shadows.context.fillStyle = gradient;
 	this.shadows.context.fill();
 	
@@ -499,9 +500,9 @@ MapRenderer.prototype.cornerTest = function(emitter){
 		this.shadows.context.lineTo(points[i].x, points[i].y);
 	}
 	this.shadows.context.closePath();
-	var t = this.shadows.context.createRadialGradient(source.x, source.y, 100, source.x, source.y, 500);
-	t.addColorStop(0, 'rgba(255, 255, 255, 1)');
-	t.addColorStop(1, 'rgba(255, 255, 255, 0)');
+	var t = this.shadows.context.createRadialGradient(source.x, source.y, 100, source.x, source.y, 500 + b * 20);
+	t.addColorStop(0, 'rgba(255, 255, 224, 0.05)');
+	t.addColorStop(1, 'rgba(0, 0, 0, 0)');
 	this.shadows.context.fillStyle = t;
 	this.shadows.context.fill();
 	

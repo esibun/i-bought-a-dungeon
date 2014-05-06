@@ -122,7 +122,7 @@ States.DungeonState.prototype = {
 		this.spawner = new MonsterSpawner(this.game, this.tileSize, this.tileScale);
 
 		//New generator (max room size, minimum room size)
-		this.generator = new Map(10, 1);
+		this.generator = new Map();
 		this.mapRenderer = new MapRenderer(this.game, this.tileSize, this.tileScale, this.width, this.height);
 		
 		//Setup sword sprite
@@ -418,8 +418,13 @@ States.DungeonState.prototype = {
 		
 		//Destroys walls and sets the floor invisible
 		this.mapRenderer.clear();
+		
+		var max = 0;
+		while(max == 0)
+			max = Math.floor(Math.random() * 10);
+		
 		//Create a new map layout
-		this.gameMap = this.generator.createMap(this.width, this.height);
+		this.gameMap = this.generator.createMap(this.width, this.height, max, 1);
 		//Draw the new map walls
 		this.mapRenderer.drawWalls(this.gameMap);
 		

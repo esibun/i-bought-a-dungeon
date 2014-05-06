@@ -1,6 +1,6 @@
-Map = function(maxRoomSize, minRoomSize){
-	this.maxRoomSize = maxRoomSize;
-	this.minRoomSize = minRoomSize;
+Map = function(){
+	this.maxRoomSize;
+	this.minRoomSize;
 	
 	this.width;
 	this.height;
@@ -15,9 +15,11 @@ Map = function(maxRoomSize, minRoomSize){
 	this.roomCount = 0;
 }
 
-Map.prototype.createMap = function(width, height){
+Map.prototype.createMap = function(width, height, maxRoomSize, minRoomSize){
 	this.width = width;
 	this.height = height;
+	this.maxRoomSize = maxRoomSize;
+	this.minRoomSize = minRoomSize;
 	
 	var map = new Array();
 	for(var x = 0; x < width; x++){
