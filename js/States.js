@@ -483,10 +483,16 @@ States.DungeonState.prototype = {
 	
 	placeStairs : function(){
 		var placed = false;
-		while(!placed){
-			var x = Math.floor(Math.random() * this.width);
-			var y = Math.floor(Math.random() * this.height);
-			if(this.gameMap[x][y] == 0){
+		var x = this.player.body.x / this.tileSize;
+		var y = (this.game.height - this.player.body.y) / this.tileSize
+		while(!placed
+		&& x < (this.player.body.x / this.tileSize) + this.mapRenderer.renderDistance 
+		&& x > (this.player.body.x / this.tileSize) - this.mapRenderer.renderDistance
+		&& y < (this.game.height - this.player.body.y) / this.tileSize + this.mapRenderer.renderDistance
+		&& y > (this.game.height - this.player.body.y) / this.tileSize - this.mapRenderer.renderDistance){
+			x = Math.floor(Math.random() * this.width);
+			y = Math.floor(Math.random() * this.height);
+			if(this.gameMap[x][y] == 0 ){
 				this.stairs.body.x = x * this.tileSize;
 				this.stairs.body.y = this.game.height - ((y+1) * this.tileSize);
 				placed = true;

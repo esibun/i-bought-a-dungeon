@@ -91,7 +91,7 @@ Character = function(sprite, health, damage, tileSize, tileScale, game, type, ma
 		this.weapon = this.game.add.sprite(0, 0, 'magearm');
 		this.weapon.scale.x = this.tileScale/1.7;
 		this.weapon.scale.y = this.tileScale/1.7;
-		this.weapon.anchor.x = 0.5;
+		this.weapon.anchor.x = 0.4;
 		this.weapon.anchor.y = -1.1;
 		this.weapon.kill();
 	
