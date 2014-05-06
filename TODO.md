@@ -1,20 +1,17 @@
 There should be issues for each of these to-do's up on GitHub:
 
-Release (5/6/14)
--------------------
-- Add hotkeys (namely E to block) ([#5](https://github.com/esibun/i-bought-a-dungeon/issues/5))
+Bonus
+------------
+- Minimap ([#4](https://github.com/esibun/i-bought-a-dungeon/issues/4))
+- Story Mode ([#16](https://github.com/esibun/i-bought-a-dungeon/issues/16))
+
+Finished
+--------
 - Fix hitboxes ([#14](https://github.com/esibun/i-bought-a-dungeon/issues/14))
 - Lose screen score-centered and larger
 - Sound recording
 - Enemy type coding ([#2](https://github.com/esibun/i-bought-a-dungeon/issues/2))
-
-Bonus
-------------
-- Minimap ([#4](https://github.com/esibun/i-bought-a-dungeon/issues/4))
-
-
-Finished
---------
+- Add hotkeys (namely E to block) ([#5](https://github.com/esibun/i-bought-a-dungeon/issues/5))
 - Make buttons slightly larger/give them transparent backgrounds
 - Design Documentation ([#1](https://github.com/esibun/i-bought-a-dungeon/issues/1))
 - Add score to main screen ([#15](https://github.com/esibun/i-bought-a-dungeon/issues/15))
