@@ -276,15 +276,19 @@ States.DungeonState.prototype = {
 			for(var j = 0; j < this.mapRenderer.colliders.length; j++)
 				this.physics.arcade.collide(this.mapRenderer.colliders[j], proj, null, this.killProjectile, this);
 		}
-		
-		//Enemy collisions (sword and walls)
+
+		//Enemy collisions (walls)
+		for ( iter = 0; iter < this.enemies.length; iter++ ) {
+			for(var x = 0; x < this.mapRenderer.colliders.length; x++){
+						this.physics.arcade.collide(this.enemies[iter].sprite, this.mapRenderer.colliders[x], null, null, this);
+			}
+		}
+
+		//Enemy collisions (sword)
 		for(var i = 0; i < this.swordBody.length; i++){
 			for(iter = 0; iter < this.enemies.length; iter++){
 				try {
 					this.physics.arcade.overlap(this.swordBody[i], this.enemies[iter].sprite, this.doDamage, null, this);
-					for(var x = 0; x < this.mapRenderer.colliders.length; x++){
-						this.physics.arcade.collide(this.enemies[iter].sprite, this.mapRenderer.colliders[x], null, null, this);
-					}
 				}
 				catch (err) {
 					break; // we've killed multiple enemies in one swing and reached the end of the array so stop checks
