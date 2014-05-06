@@ -62,7 +62,15 @@ Character = function(sprite, health, damage, tileSize, tileScale, game, type, ma
 	this.attackSpeed = 2;
 	
 	this.projectiles;
+	this.weapon;
 	if(this.type == 'archer'){
+		this.weapon = this.game.add.sprite(0, 0, 'bow');
+		this.weapon.scale.x = this.tileScale;
+		this.weapon.scale.y = this.tileScale;
+		this.weapon.anchor.x = -1;
+		this.weapon.anchor.y = 0.5;
+		this.weapon.kill();
+	
 		this.projectiles = this.game.add.group();
 		this.projectiles.createMultiple(6, 'arrow');
 		this.projectiles.setAll('anchor.x', 0.5);
@@ -243,6 +251,13 @@ Character.prototype.keepAtDistance = function(target, speed, distance){
 Character.prototype.archerUpdate = function(target, speed){
 	this.keepAtDistance(target, speed, 0.8);
 	if(this.attackTimer <= 0){
+		this.weapon.revive();
+		this.weapon.x = this.sprite.x;
+		this.weapon.y = this.sprite.y;
+		this.weapon.rotation = this.sprite.rotation;
+		this.weapon.lifespan = 200;
+		
+		this.weapon.visible = true;
 		var ray = new Phaser.Line(this.sprite.x, this.sprite.y, target.x, target.y);
 		var intersection = this.mapRenderer.raycast(ray, this.sprite);
 		if(!intersection){
@@ -252,6 +267,9 @@ Character.prototype.archerUpdate = function(target, speed){
 	}
 	else{
 		this.attackTimer -= this.game.time.physicsElapsed;
+		this.weapon.x = this.sprite.x;
+		this.weapon.y = this.sprite.y;
+		this.weapon.rotation = this.sprite.rotation;
 	}
 }
 

@@ -76,6 +76,7 @@ States.DungeonState.prototype = {
 		this.load.image('shield', 'assets/shield.png');
 		this.load.image('arrow', 'assets/arrow.png');
 		this.load.image('mageball', 'assets/mageball.png');
+		this.load.image('bow', 'assets/bow.png');
 		this.load.spritesheet('healthbar', 'assets/health_bar.png', 35, 32, 6);
 		this.load.spritesheet('player', 'assets/playercharacter.png', 51, 70, 6);
 		this.load.spritesheet('darkknight', 'assets/darkknight.png', 50, 70, 6);
