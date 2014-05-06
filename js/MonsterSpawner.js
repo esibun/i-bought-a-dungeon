@@ -7,12 +7,13 @@ MonsterSpawner = function(game, tileSize, tileScale){
 MonsterSpawner.prototype.spawnRandom = function (map, amount, type, health, damage, mapRenderer, avoid){
 	var mobs = new Array();
 	for(var i = 0; i < amount; i++){
+		
 		var x = avoid.x / this.tileSize;
-		var y = avoid.y / this.tileSize; 
+		var y = (avoid.game.height - avoid.y) / this.tileSize; 
 		while(x < (avoid.x / this.tileSize) + mapRenderer.renderDistance 
 		&& x > (avoid.x / this.tileSize) - mapRenderer.renderDistance
-		&& y < (avoid.y / this.tileSize) + mapRenderer.renderDistance
-		&& y > (avoid.y / this.tileSize) - mapRenderer.renderDistance){
+		&& y < (avoid.game.height - avoid.y) / this.tileSize + mapRenderer.renderDistance
+		&& y > (avoid.game.height - avoid.y) / this.tileSize - mapRenderer.renderDistance){
 			x = Math.floor(Math.random() * map.length);
 			y = Math.floor(Math.random() * map[0].length);
 			while(map[x][y] != 0){
