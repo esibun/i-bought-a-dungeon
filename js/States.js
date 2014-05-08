@@ -575,14 +575,21 @@ States.LoseState.prototype = {
 	}
 }
 States.WinState = function(game){
+	this.button;
 }
 States.WinState.prototype = {
 	preload: function() {
 		this.load.image('background', 'assets/win_screen.png');
+		this.load.spritesheet('button', 'assets/continuebutton.png', 193, 71, 3);
 	},
 
 	create: function() {
 		this.add.sprite(0, 0, 'background');
 		this.add.text(550, 450, "Final Score: " + score, { font: "80px Arial", fill: "#ffffff", align: "left" })
+		this.button = this.add.button(703.5, 875, 'button', this.startGame, this, 1, 1, 0);
+	},
+
+	startGame: function() {
+		this.state.start('dungeon');
 	}
 }
