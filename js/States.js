@@ -209,7 +209,7 @@ States.DungeonState.prototype = {
 		//this.footsteps.addMarker('step', 0, 0.1, 0.4, false);
 
 		//Add shield keybinding
-		this.keyspace = this.input.keyboard.addKey(Phaser.Keyboard.SPACE);
+		this.keyspace = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 		this.keyspace.onDown.add(this.raiseShield, this);
 		this.keyspace.onUp.add(this.lowerShield, this);
 		
